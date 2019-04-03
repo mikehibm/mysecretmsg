@@ -1,0 +1,28 @@
+body {
+  background-color: #444;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+.main {
+  font-size: x-large;
+  color: blue;
+  width: 100vmin;
+  height: 100vh;
+  margin: auto;
+  background-color: #444;
+  background-image: url('./enigma.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center bottom;
+}
+
+button {
+  padding: 0.8em;
+  font-size: large;
+}
+
+.reset {
+  color: red;
+}
