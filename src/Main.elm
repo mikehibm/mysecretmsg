@@ -1,5 +1,6 @@
 module Main exposing (main)
 
+import String
 import Browser
 import Browser.Navigation as Nav
 import Browser.Events exposing (..)
@@ -9,9 +10,8 @@ import Html.Events exposing (onClick)
 import Url
 import Json.Decode as Decode
 
--- type Key
---   = Character Char
---   | Control String
+alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+letters = ["A", "B", "C"]
 
 keyDecoder : Decode.Decoder Msg
 keyDecoder =
@@ -90,7 +90,14 @@ update msg model =
       , Cmd.none
       )
 
+alphabetToLetters: String -> List Char
+alphabetToLetters str = String.toList alphabet
 
+lettersToButtons: List Char -> List (Html Msg)
+lettersToButtons list =
+  List.map (\x ->
+    button [onClick (AddLetter (String.fromChar x))]
+    [ text (String.fromChar x)]) list
 
 
 view : Model -> Browser.Document Msg
@@ -100,6 +107,8 @@ view model =
       div [ class "main" ] [
         div [] [ text model.rawStr, text " / ",  text (String.fromInt (String.length model.rawStr)) ]
         , button [ class "reset", onClick Reset ] [ text "Reset" ]
+        , br [] []
+        , div [] (lettersToButtons (alphabetToLetters alphabet))
       ]
     ]
   }
