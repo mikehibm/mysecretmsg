@@ -91,3 +91,12 @@ button.encrypt {
   color: blue;
   background-color: #eee;
 }
+
+.key-dialog {
+  position: relative;
+  width: 80%;
+  height: 20%;
+  margin: auto;
+  background-color: #eee;
+  color: blue;
+}

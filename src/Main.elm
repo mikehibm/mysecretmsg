@@ -135,7 +135,10 @@ renderKeyDialog model =
   if model.isKeyDialogOpen == False then
     div [] []
   else
-    div [] [ text "renderKeyDialog" ]
+    div [ class "key-dialog" ] [
+      text "Input a random key"
+      , input [ type_ "number", value "", maxlength 4, placeholder "0000" ] []
+    ]
 
 view : Model -> Browser.Document Msg
 view model =
