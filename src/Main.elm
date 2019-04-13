@@ -17,6 +17,13 @@ keys = [
   " "
   ]
 
+keysNum = [
+    "123",
+    "456",
+    "789",
+    "0"
+  ]
+
 max_length = 90
 
 
@@ -49,14 +56,19 @@ type Msg
   | Control String
   | Reset
   | EncryptClick
-  | Encrypt String
+  | Encrypt
+  | BackToMessage
   | LinkClicked Browser.UrlRequest
   | UrlChanged Url.Url
 
+type InputMode = Message | EncKey
+
 type alias Model = {
     rawStr : String,
+    encKey: String,
     encryptedStr: String,
     isKeyDialogOpen: Bool,
+    mode: InputMode,
     key : Nav.Key,
     url : Url.Url
   }
@@ -66,11 +78,17 @@ subscriptions model =
     Browser.Events.onKeyDown keyDecoder
 
 
+encrypt : String -> String -> String
+encrypt rawStr encKey =
+  rawStr ++ encKey
+
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key = ({
     rawStr = "",
+    encKey = "",
     encryptedStr = "",
     isKeyDialogOpen = False,
+    mode = Message,
     key = key,
     url = url
   }, Cmd.none)
@@ -79,26 +97,42 @@ update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     AddLetter letter ->
-      ({ model |
-          rawStr =
-            (if (String.length model.rawStr) < max_length then
-              model.rawStr ++ letter
-            else
-              model.rawStr
-            )
-      }, Cmd.none)
+      if model.mode == Message then
+        ({ model |
+            rawStr =
+              (if (String.length model.rawStr) < max_length then
+                model.rawStr ++ letter
+              else
+                model.rawStr
+              )
+        }, Cmd.none)
+      else
+        ({ model |
+            encKey =
+              (if (String.length model.encKey) < 4 then
+                model.encKey ++ letter
+              else
+                model.encKey
+              )
+        }, Cmd.none)
 
     Control _ ->
       (model, Cmd.none)
 
     Reset ->
-      ({ model | rawStr = "" }, Cmd.none)
+      if model.mode == Message then
+        ({ model | rawStr = "" }, Cmd.none)
+      else
+        ({ model | encKey = "" }, Cmd.none)
 
     EncryptClick ->
-      ({model | isKeyDialogOpen = True }, Cmd.none)
+      ({model | mode = EncKey }, Cmd.none)
 
-    Encrypt key ->
-      (model, Cmd.none)
+    Encrypt ->
+      ({model | mode = Message, encKey = "", rawStr = (encrypt model.rawStr  model.encKey) }, Cmd.none)
+
+    BackToMessage ->
+      ({model | mode = Message }, Cmd.none)
 
     LinkClicked urlRequest ->
       case urlRequest of
@@ -125,10 +159,12 @@ lettersToButtons list =
       ]
   ) list
 
-renderKeyboard : Html Msg
-renderKeyboard =
+renderKeyboard : Model -> Html Msg
+renderKeyboard model =
   div [ class "keyboard" ] (List.map (\s ->
-    div [] (lettersToButtons (String.toList s))) keys)
+      div [] (lettersToButtons (String.toList s)))
+            (if (model.mode == Message) then keys else keysNum)
+    )
 
 renderKeyDialog : Model -> Html Msg
 renderKeyDialog model =
@@ -136,8 +172,18 @@ renderKeyDialog model =
     div [] []
   else
     div [ class "key-dialog" ] [
-      text "Input a random key"
-      , input [ type_ "number", value "", maxlength 4, placeholder "0000" ] []
+      div [ class "key-dialog-title" ] [
+        div [ class "key-dialog-close" ] [
+          button [] [ text "X" ]
+        ]
+      ]
+      , text "Input a random key"
+      , br [] []
+      , input [
+          class "key-input",
+          type_ "number",
+          maxlength 4,
+          placeholder "0000" ] []
     ]
 
 view : Model -> Browser.Document Msg
@@ -146,17 +192,32 @@ view model =
   , body = [
       div [ class "main" ]
         [
-          div [ class "input" ]
+          div [ class (if model.mode == Message then "input" else "input encKey") ]
             [
-              text model.rawStr
+              (if model.mode == EncKey then
+                div [] [ text "INPUT KEY" ]
+              else
+                text ""
+              )
+              , text (if model.mode == Message then model.rawStr else model.encKey)
             ]
           , div [ class "counter" ]
             [
               text (String.fromInt (max_length - String.length model.rawStr))
               , button [ class "reset", onClick Reset ] [ text "CLEAR" ]
-              , button [ class "encrypt", onClick EncryptClick ] [ text "ENCRYPT / DECRYPT" ]
+              , br [][]
+              , (if model.mode == EncKey then
+                  button [ class "back", onClick BackToMessage ][ text " < "]
+                else
+                  text ""
+                )
+              , (if model.mode == Message then
+                  button [ class "encrypt", onClick EncryptClick ] [ text " > " ]
+                 else
+                  button [ class "encrypt", onClick Encrypt ] [ text " >> " ]
+              )
             ]
-          , renderKeyboard
+          , renderKeyboard model
           , renderKeyDialog model
         ]
     ]

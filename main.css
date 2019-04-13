@@ -36,6 +36,10 @@ body {
   overflow-y: scroll;
 }
 
+.input.encKey {
+  background-color: #cff;
+}
+
 .counter {
   position: relative;
   width: 68%;
@@ -94,9 +98,29 @@ button.encrypt {
 
 .key-dialog {
   position: relative;
-  width: 80%;
+  width: 88%;
   height: 20%;
   margin: auto;
   background-color: #eee;
   color: blue;
+}
+
+.key-dialog-title {
+  position: relative;
+  background-color: skyblue;
+}
+
+.key-dialog-close {
+  width: 2em;
+  margin-left: 88%;
+}
+
+.key-dialog-close button {
+  color: gray;
+  background-color: #ccf;
+}
+
+.key-input {
+  text-align: center;
+  font-size: 6vmin;
 }
