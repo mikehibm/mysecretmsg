@@ -192,14 +192,14 @@ view model =
   , body = [
       div [ class "main" ]
         [
-          div [ class (if model.mode == Message then "input" else "input encKey") ]
+          div [ class (if model.mode == Message then "input" else "input flipped") ]
             [
-              (if model.mode == EncKey then
-                div [] [ text "INPUT KEY" ]
-              else
-                text ""
-              )
-              , text (if model.mode == Message then model.rawStr else model.encKey)
+              text model.rawStr
+            ]
+          , div [ class (if model.mode == Message then "input encKey flipped" else "input encKey") ]
+            [
+              div [] [ text "INPUT KEY" ]
+              , text model.encKey
             ]
           , div [ class "counter" ]
             [
