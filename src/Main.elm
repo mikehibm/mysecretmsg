@@ -9,11 +9,12 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Url
 import Json.Decode as Decode
+import Encrypt exposing (..)
 
 keys = [
   "QWERTYUIOP",
   "ASDFGHJKL",
-  "ZXCVBNM",
+  "ZXCVBNM!?",
   " "
   ]
 
@@ -66,7 +67,6 @@ type InputMode = Message | EncKey
 type alias Model = {
     rawStr : String,
     encKey: String,
-    encryptedStr: String,
     isKeyDialogOpen: Bool,
     mode: InputMode,
     key : Nav.Key,
@@ -77,16 +77,10 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Browser.Events.onKeyDown keyDecoder
 
-
-encrypt : String -> String -> String
-encrypt rawStr encKey =
-  rawStr ++ encKey
-
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key = ({
     rawStr = "",
     encKey = "",
-    encryptedStr = "",
     isKeyDialogOpen = False,
     mode = Message,
     key = key,
@@ -129,7 +123,7 @@ update msg model =
       ({model | mode = EncKey }, Cmd.none)
 
     Encrypt ->
-      ({model | mode = Message, encKey = "", rawStr = (encrypt model.rawStr  model.encKey) }, Cmd.none)
+      ({model | mode = Message, rawStr = (encrypt model.rawStr  model.encKey) }, Cmd.none)
 
     BackToMessage ->
       ({model | mode = Message }, Cmd.none)
@@ -198,7 +192,8 @@ view model =
             ]
           , div [ class (if model.mode == Message then "input encKey flipped" else "input encKey") ]
             [
-              div [] [ text "INPUT KEY" ]
+              div [] [ text "KEY" ]
+              , br [] []
               , text model.encKey
             ]
           , div [ class "counter" ]
@@ -219,6 +214,7 @@ view model =
             ]
           , renderKeyboard model
           , renderKeyDialog model
+          , div [] [text (encrypt model.rawStr model.encKey) ]
         ]
     ]
   }
