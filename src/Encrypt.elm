@@ -1,50 +1,77 @@
-module Encrypt exposing (..)
+module Encrypt exposing (encrypt)
 
 import String exposing (..)
 import Char exposing (..)
-import Basics exposing (..)
-import Bitwise exposing (..)
-import Array
+import List exposing (..)
+import Array exposing (..)
 
 encrypt : String -> String -> String
 encrypt rawStr encKey =
-  map (\ch -> (replace ch 1)) rawStr
+  String.toList rawStr
+  |> List.indexedMap (\i ch -> (
+            getIndexForEncKey i encKey
+            |> getOneCharFromString '0' encKey)
+            |> String.fromChar
+            |> String.toInt
+            |> Maybe.withDefault 0
+            |> (replace ch)
+          )
+  |> String.fromList
+
+getIndexForEncKey : Int -> String -> Int
+getIndexForEncKey i encKey =
+  let
+    len = String.length encKey
+  in
+    if len > 0 then
+      modBy len i
+    else
+      0
+
+getOneCharFromString : Char -> String -> Int -> Char
+getOneCharFromString defaultChar str index =
+  if index >= 0 then
+    String.slice index (index + 1) str
+    |> String.toList
+    |> head
+    |> Maybe.withDefault defaultChar
+  else
+    defaultChar
 
 getFromTable : Int -> String
 getFromTable n =
-  case (Array.get n (Array.fromList table)) of
-    Just str -> str
-    Nothing -> ""
+  get n (Array.fromList table)
+  |> Maybe.withDefault ""
 
-findIndex : Char -> Int -> Int
-findIndex ch n =
-  case (Array.get 0 (Array.fromList (String.indexes (String.fromChar ch) (getFromTable n)))) of
-    Just ix -> ix
-    Nothing -> 0
-
-getNewIndex : Int -> Int
-getNewIndex i =
-  if (modBy 2 i) == 0 then
-    i + 1
-  else
-    i - 1
+findIndex : Char -> String -> Int
+findIndex ch tableStr =
+  let
+    ix = tableStr
+      |> String.indexes (String.fromChar ch)
+      |> List.head
+  in
+    case ix of
+      Just i ->
+        if (modBy 2 i) == 0 then i + 1 else i - 1
+      Nothing -> -1
 
 replace : Char -> Int -> Char
 replace ch n =
-  case (List.head (String.toList (String.slice ((findIndex ch n) |> getNewIndex) (((findIndex ch n) |> getNewIndex) + 1) (getFromTable n)))) of
-    Just c -> c
-    Nothing -> ' '
+  let
+    tableStr = getFromTable n
+  in
+    findIndex ch tableStr
+    |> getOneCharFromString '_' tableStr
 
 table = [
-    -- "ABCDEFGHIJKLMNOPQRSTUVWXYZ !?",
-    "VC!EAXBHIJKDL NOPQYRSU?MWTFGZ",
-    "C!VA XHEIZDKLBNOQYRSUPMJWTF?G",
-    "X!E A?BHIVJKDCLNOPYRSGUMWQTFZ",
-    "ZLF?!XHURSQE ABIVJKDCNOPYMWTG",
-    "W NAZGLF?XHURSQEBIVJ!KDCOPYMT",
-    "YMTINWAZGL?XHUFRSQBV JE!DCOKP",
-    "RYMIN?WAZTGLXHUCPFQBV JES!DOK",
-    "JRY?NTGWAZ MILXKHUCES!FQBPVDO",
-    "WA?NT JRYDOG!PFLXKHUCZEMISQBV",
-    "TWAJRYOGC?NDFLXKH!UZSVPQE MIB"
+    "VC!EAXBHIJKDL NOPQYRSU?MWTFGZ",  -- 0
+    "C!VA XHEIZDKLBNOQYRSUPMJWTF?G",  -- 1
+    "X!E A?BHIVJKDCLNOPYRSGUMWQTFZ",  -- 2
+    "ZLF?!XHURSQE ABIVJKDCNOPYMWTG",  -- 3
+    "W NAZGLF?XHURSQEBIVJ!KDCOPYMT",  -- 4
+    "YMTINWAZGL?XHUFRSQBV JE!DCOKP",  -- 5
+    "RYMIN?WAZTGLXHUCPFQBV JES!DOK",  -- 6
+    "JRY?NTGWAZ MILXKHUCES!FQBPVDO",  -- 7
+    "WA?NT JRYDOG!PFLXKHUCZEMISQBV",  -- 8
+    "TWAJRYOGC?NDFLXKH!UZSVPQE MIB"   -- 9
   ]

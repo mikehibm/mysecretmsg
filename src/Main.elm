@@ -9,7 +9,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Url
 import Json.Decode as Decode
-import Encrypt exposing (..)
+import Encrypt exposing (encrypt)
 
 keys = [
   "QWERTYUIOP",
