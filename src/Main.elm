@@ -122,9 +122,9 @@ update msg model =
 
     Backspace ->
       if model.mode == Message then
-        ({ model | rawStr = (String.slice 0 -1 model.rawStr) }, Cmd.none)
+        ({ model | rawStr = (String.dropRight 1 model.rawStr) }, Cmd.none)
       else
-        ({ model | encKey = (String.slice 0 -1 model.encKey) }, Cmd.none)
+        ({ model | encKey = (String.dropRight 1 model.encKey) }, Cmd.none)
 
     EncryptClick ->
       ({model | mode = EncKey }, Cmd.none)
@@ -167,25 +167,25 @@ renderKeyboard model =
             (if (model.mode == Message) then keys else keysNum)
     )
 
-renderKeyDialog : Model -> Html Msg
-renderKeyDialog model =
-  if model.isKeyDialogOpen == False then
-    div [] []
-  else
-    div [ class "key-dialog" ] [
-      div [ class "key-dialog-title" ] [
-        div [ class "key-dialog-close" ] [
-          button [] [ text "X" ]
-        ]
-      ]
-      , text "Input a random key"
-      , br [] []
-      , input [
-          class "key-input",
-          type_ "number",
-          maxlength 4,
-          placeholder "0000" ] []
-    ]
+-- renderKeyDialog : Model -> Html Msg
+-- renderKeyDialog model =
+--   if model.isKeyDialogOpen == False then
+--     div [] []
+--   else
+--     div [ class "key-dialog" ] [
+--       div [ class "key-dialog-title" ] [
+--         div [ class "key-dialog-close" ] [
+--           button [] [ text "X" ]
+--         ]
+--       ]
+--       , text "Input a random key"
+--       , br [] []
+--       , input [
+--           class "key-input",
+--           type_ "number",
+--           maxlength 4,
+--           placeholder "0000" ] []
+--     ]
 
 view : Model -> Browser.Document Msg
 view model =
@@ -221,8 +221,8 @@ view model =
               )
             ]
           , renderKeyboard model
-          , renderKeyDialog model
-          , div [] [text (encrypt model.rawStr model.encKey) ]
+          -- , renderKeyDialog model
+          -- , div [] [text (encrypt model.rawStr model.encKey) ]
         ]
     ]
   }
