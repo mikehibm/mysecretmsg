@@ -26,6 +26,7 @@ keysNum = [
   ]
 
 max_length = 90
+max_length_key = 4
 
 
 keyDecoder : Decode.Decoder Msg
@@ -104,7 +105,7 @@ update msg model =
       else
         ({ model |
             encKey =
-              (if (String.length model.encKey) < 4 then
+              (if (String.length model.encKey) < max_length_key then
                 model.encKey ++ letter
               else
                 model.encKey
@@ -167,6 +168,13 @@ renderKeyboard model =
             (if (model.mode == Message) then keys else keysNum)
     )
 
+remainLength : Model -> Int
+remainLength model =
+  if model.mode == Message then
+    max_length - (String.length model.rawStr)
+  else
+    max_length_key - (String.length model.encKey)
+
 -- renderKeyDialog : Model -> Html Msg
 -- renderKeyDialog model =
 --   if model.isKeyDialogOpen == False then
@@ -205,7 +213,7 @@ view model =
             ]
           , div [ class "counter" ]
             [
-              text (String.fromInt (max_length - String.length model.rawStr))
+              text (String.fromInt (remainLength model))
               , button [ class "backspace", onClick Backspace ] [ text "DEL" ]
               , button [ class "reset", onClick Reset ] [ text "CLR" ]
               , br [][]
