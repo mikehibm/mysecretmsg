@@ -8,13 +8,15 @@ import Array exposing (..)
 encrypt : String -> String -> String
 encrypt rawStr encKey =
   String.toList rawStr
-  |> List.indexedMap (\i ch -> (
+  |> List.indexedMap (\i ch ->
             getIndexForEncKey i encKey
-            |> getOneCharFromString '0' encKey)
+            |> getOneCharFromString '0' encKey
             |> String.fromChar
             |> String.toInt
             |> Maybe.withDefault 0
-            |> (replace ch)
+            |> (+) i
+            |> modBy (List.length table)
+            |> replace ch
           )
   |> String.fromList
 
