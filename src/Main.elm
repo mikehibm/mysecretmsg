@@ -14,7 +14,7 @@ import Encrypt exposing (encrypt)
 keys = [
   "QWERTYUIOP",
   "ASDFGHJKL",
-  "ZXCVBNM!?",
+  "ZXCVBNM.?",
   " "
   ]
 
@@ -56,6 +56,7 @@ type Msg
   = AddLetter String
   | Control String
   | Reset
+  | Backspace
   | EncryptClick
   | Encrypt
   | BackToMessage
@@ -118,6 +119,12 @@ update msg model =
         ({ model | rawStr = "" }, Cmd.none)
       else
         ({ model | encKey = "" }, Cmd.none)
+
+    Backspace ->
+      if model.mode == Message then
+        ({ model | rawStr = (String.slice 0 -1 model.rawStr) }, Cmd.none)
+      else
+        ({ model | encKey = (String.slice 0 -1 model.encKey) }, Cmd.none)
 
     EncryptClick ->
       ({model | mode = EncKey }, Cmd.none)
@@ -199,7 +206,8 @@ view model =
           , div [ class "counter" ]
             [
               text (String.fromInt (max_length - String.length model.rawStr))
-              , button [ class "reset", onClick Reset ] [ text "CLEAR" ]
+              , button [ class "backspace", onClick Backspace ] [ text "DEL" ]
+              , button [ class "reset", onClick Reset ] [ text "CLR" ]
               , br [][]
               , (if model.mode == EncKey then
                   button [ class "back", onClick BackToMessage ][ text " < "]

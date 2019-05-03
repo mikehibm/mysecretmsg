@@ -100,6 +100,11 @@ button.reset {
   background-color: #eee;
 }
 
+button.backspace {
+  color: blue;
+  background-color: #eee;
+}
+
 button.encrypt {
   color: blue;
   background-color: #eee;
