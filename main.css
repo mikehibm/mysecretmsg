@@ -10,7 +10,7 @@ body {
   color: lightblue;
   width: 100vmin;
   height: 100vh;
-  max-width: 800px;
+  max-width: 900px;
   margin: auto;
   background-color: #444;
   background-image: url('./enigma.jpg');
@@ -68,7 +68,7 @@ body {
 .keyboard {
   position: relative;
   width: 100%;
-  top: 55%;
+  top: 42%;
   margin: auto auto;
   text-align: center;
 }
@@ -110,7 +110,7 @@ button.encrypt {
   background-color: #eee;
 }
 
-.key-dialog {
+/* .key-dialog {
   position: relative;
   width: 88%;
   height: 20%;
@@ -132,7 +132,7 @@ button.encrypt {
 .key-dialog-close button {
   color: gray;
   background-color: #ccf;
-}
+} */
 
 .key-input {
   text-align: center;
