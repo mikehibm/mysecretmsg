@@ -184,6 +184,10 @@ remainLength mode model =
   else
     max_length_key - (String.length model.encKey)
 
+renderTextAsList: String -> List (Html Msg)
+renderTextAsList string =
+  List.map  (\c -> div [class "letter"] [text (if c == ' ' then " " else (String.fromChar c))]) (String.toList string)
+
 view : Model -> Browser.Document Msg
 view model =
   { title = "My Secret Message"
@@ -191,10 +195,7 @@ view model =
       div [ class "main" ]
         [
           div [ class (if model.mode == Message then "input" else "input flipped") ]
-            [
-              text (model.rawStr ++
-                    (if (remainLength Message model) > 0 then "_" else ""))
-            ]
+              (renderTextAsList model.rawStr)
           , div [ class (if model.mode == Message then "input encKey flipped" else "input encKey") ]
             [
               div [] [ text "INPUT A KEY" ]

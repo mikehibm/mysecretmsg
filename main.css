@@ -55,6 +55,15 @@ body {
   text-align: center;
 }
 
+.letter {
+  float: left;
+  width: 3.1vmin;
+  height: 5vmin;
+  white-space: pre;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  border-right: 1px solid rgba(0, 0, 0, 0.2);
+}
+
 .counter {
   position: relative;
   width: 90%;
