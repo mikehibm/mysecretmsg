@@ -36,7 +36,8 @@ keyDecoder =
 toKey : String -> Msg
 toKey string =
   case String.uncons string of
-    Just (char, "") -> AddLetter (String.toUpper (String.fromChar char))
+    Just (char, "") ->
+      AddLetter (String.toUpper (String.fromChar char))
     _ ->
       case string of
         "Backspace" -> BackspaceKey
@@ -60,9 +61,6 @@ type Msg
   | Reset
   | BackspaceKey
   | EnterKey
-  | EncryptClick
-  | Encrypt
-  | BackToMessage
   | LinkClicked Browser.UrlRequest
   | UrlChanged Url.Url
 
@@ -102,7 +100,7 @@ update msg model =
           ({ model |
               rawStr =
                 (if (String.length model.rawStr) < max_length then
-                  model.rawStr ++ letter
+                  model.rawStr ++ (filterInputLetter letter keys)
                 else
                   model.rawStr
                 )
@@ -111,7 +109,7 @@ update msg model =
           ({ model |
               encKey =
                 (if (String.length model.encKey) < max_length_key then
-                  model.encKey ++ letter
+                  model.encKey ++ (filterInputLetter letter keysNum)
                 else
                   model.encKey
                 )
@@ -119,7 +117,6 @@ update msg model =
 
     Control str ->
       (model, Cmd.none)
-      --({model | rawStr = model.rawStr ++ str}, Cmd.none)
 
     Reset ->
       case model.mode of
@@ -140,16 +137,9 @@ update msg model =
         Message
           -> ({model | mode = EncKey }, Cmd.none)
         _
-          -> ({model | mode = Message, rawStr = (encrypt model.rawStr model.encKey) }, Cmd.none)
-
-    EncryptClick ->
-      ({model | mode = EncKey }, Cmd.none)
-
-    Encrypt ->
-      ({model | mode = Message, rawStr = (encrypt model.rawStr  model.encKey) }, Cmd.none)
-
-    BackToMessage ->
-      ({model | mode = Message }, Cmd.none)
+          -> ({model | mode = Message,
+                       rawStr = (encrypt model.rawStr model.encKey) },
+              Cmd.none)
 
     LinkClicked urlRequest ->
       case urlRequest of
@@ -160,6 +150,13 @@ update msg model =
 
     UrlChanged url ->
       ( { model | url = url }, Cmd.none )
+
+filterInputLetter: String -> List String -> String
+filterInputLetter letter allowedKeys =
+  if List.any (String.contains letter) allowedKeys then
+    letter
+  else
+    ""
 
 lettersToButtons: List Char -> List (Html Msg)
 lettersToButtons list =
@@ -214,9 +211,9 @@ view model =
               , button [ class "backspace", onClick BackspaceKey ] [ text "DEL" ]
               , button [ class "reset", onClick Reset ] [ text "CLR" ]
               , (if model.mode == Message then
-                  button [ class "encrypt", onClick EncryptClick ] [ text "ENTER" ]
+                  button [ class "encrypt", onClick EnterKey ] [ text "ENTER" ]
                  else
-                  button [ class "encrypt", onClick Encrypt ] [ text "ENTER" ]
+                  button [ class "encrypt", onClick EnterKey ] [ text "ENTER" ]
               )
             ]
           , renderKeyboard model
