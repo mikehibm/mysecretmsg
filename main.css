@@ -96,16 +96,16 @@ button {
   text-align: center;
   font-size: 5vmin;
   color: #fff;
-  background-color: #666;
+  background-color: #555;
   border: solid 1px #fff;
 }
 
 button.key {
   margin: 1px;
-  width: 9.2%;
+  width: 8.9vmin;
   height: 9vmin;
   text-align: center;
-  font-size: 4.4vmin;
+  font-size: 4vmin;
   border-radius: 48%;
 }
 
