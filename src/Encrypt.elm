@@ -65,9 +65,10 @@ replace ch n =
     findIndex ch tableStr
     |> getOneCharFromString '_' tableStr
 
--- ランダムな置換テーブル。
--- 奇数位置の文字と偶数位置の文字が置換ペア。
--- 長さが奇数の場合は必ず末尾に'#'を付けて偶数になるようにする。
+-- 置換テーブル。
+-- 10個のうちどれを使うかがEncKeyによって決まる。
+-- 奇数位置の文字と偶数位置の文字をペアとみなして置き換える。
+-- 長さが奇数の場合は偶数になるように末尾の文字をリピートすること。
 table = [
     "VC.EAXBHIJKDL NOPQYRSU?MWTFGZZ",  -- 0
     "C.VA XHEIZDKLBNOQYRSUPMJWTF?GG",  -- 1
