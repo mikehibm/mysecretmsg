@@ -114,16 +114,23 @@ button.space {
   height: 9vmin;
 }
 
-button.reset {
-  color: red;
-}
-
 button.backspace {
   color: blue;
 }
 
+button.reset {
+  color: red;
+}
+
 button.encrypt {
   color: blue;
+}
+
+button.backspace:disabled,
+button.reset:disabled,
+button.encrypt:disabled {
+  color: #aaa;
+  background-color: #555;
 }
 
 .key-input {

@@ -188,35 +188,57 @@ renderTextAsList: String -> List (Html Msg)
 renderTextAsList string =
   List.map  (\c -> div [class "letter"] [text (if c == ' ' then " " else (String.fromChar c))]) (String.toList string)
 
+renderMessageInput: Model -> Html Msg
+renderMessageInput model =
+  div [ class (if model.mode == Message then "input" else "input flipped") ]
+      (renderTextAsList model.rawStr)
+
+
+renderEncKeyInput: Model -> Html Msg
+renderEncKeyInput model =
+  div [ class (if model.mode == Message then "input encKey flipped" else "input encKey") ]
+      [
+        div [] [ text "INPUT A KEY" ]
+        , br [] []
+        , text (model.encKey ++
+                (if (remainLength EncKey model) > 0 then
+                  (String.repeat (remainLength EncKey model) "_")
+                  else
+                  ""))
+      ]
+
+renderButtons: Model -> Html Msg
+renderButtons model =
+  let
+    disableButtons =
+      if model.mode == Message then
+        (String.length model.rawStr) == 0
+      else
+        (String.length model.encKey) == 0
+
+    disableEnter =
+      if model.mode == Message then
+        disableButtons
+      else
+        disableButtons || (String.length model.encKey) < max_length_key
+  in
+  div [ class "counter" ]
+      [
+        span [ class "number" ] [ text(String.fromInt (remainLength model.mode model)) ]
+        , button [ class "backspace", onClick BackspaceKey, disabled disableButtons ] [ text "DEL" ]
+        , button [ class ("reset"), onClick Reset, disabled disableButtons] [ text "CLR" ]
+        , button [ class ("encrypt"), onClick EnterKey, disabled disableEnter] [ text "ENTER" ]
+      ]
+
 view : Model -> Browser.Document Msg
 view model =
   { title = "My Secret Message"
   , body = [
       div [ class "main" ]
         [
-          div [ class (if model.mode == Message then "input" else "input flipped") ]
-              (renderTextAsList model.rawStr)
-          , div [ class (if model.mode == Message then "input encKey flipped" else "input encKey") ]
-            [
-              div [] [ text "INPUT A KEY" ]
-              , br [] []
-              , text (model.encKey ++
-                      (if (remainLength EncKey model) > 0 then
-                        (String.repeat (remainLength EncKey model) "_")
-                       else
-                        ""))
-            ]
-          , div [ class "counter" ]
-            [
-              span [ class "number" ] [ text(String.fromInt (remainLength model.mode model)) ]
-              , button [ class "backspace", onClick BackspaceKey ] [ text "DEL" ]
-              , button [ class "reset", onClick Reset ] [ text "CLR" ]
-              , (if model.mode == Message then
-                  button [ class "encrypt", onClick EnterKey ] [ text "ENTER" ]
-                 else
-                  button [ class "encrypt", onClick EnterKey ] [ text "ENTER" ]
-              )
-            ]
+          renderMessageInput model
+          , renderEncKeyInput model
+          , renderButtons model
           , renderKeyboard model
         ]
     ]
