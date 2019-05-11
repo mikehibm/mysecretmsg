@@ -71,7 +71,6 @@ type InputMode
 type alias Model = {
     rawStr : String,
     encKey: String,
-    isKeyDialogOpen: Bool,
     mode: InputMode,
     navKey : Nav.Key,
     url : Url.Url
@@ -85,7 +84,6 @@ init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key = ({
     rawStr = "",
     encKey = "",
-    isKeyDialogOpen = False,
     mode = Message,
     navKey = key,
     url = url
@@ -186,7 +184,7 @@ remainLength mode model =
 
 renderTextAsList: String -> List (Html Msg)
 renderTextAsList string =
-  List.map  (\c -> div [class "letter"] [text (if c == ' ' then " " else (String.fromChar c))]) (String.toList string)
+  List.map  (\c -> div [class "letter"] [text (String.fromChar c)]) (String.toList string)
 
 renderMessageInput: Model -> Html Msg
 renderMessageInput model =
